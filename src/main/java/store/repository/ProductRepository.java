@@ -40,7 +40,7 @@ public class ProductRepository {
         return new Product(name, price, quantity, promotion);
     }
 
-    public void updateProductQuantity(String productName, int quantity) throws URISyntaxException {
+    public void updateProductQuantity(String productName, int quantity) {
         for (Product product : products) {
             if (product.getName().equalsIgnoreCase(productName)) {
                 product.setQuantity(product.getQuantity() - quantity);
@@ -49,5 +49,13 @@ public class ProductRepository {
         }
     }
 
-
+    public void updatePromotionQuantity(String productName, String promotionName, int quantity) {
+        for (Product product : products) {
+            if (product.getName().equalsIgnoreCase(productName) &&
+                    promotionName.equalsIgnoreCase(product.getPromotion())) {
+                product.setQuantity(product.getQuantity() - quantity);
+                break;
+            }
+        }
+    }
 }
