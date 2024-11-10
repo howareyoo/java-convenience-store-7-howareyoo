@@ -23,7 +23,7 @@ public class Promotion {
     }
 
     // 프로모션 단위 계산 메서드 (buyQuantity + getQuantity)
-    private int getPromotionUnit() {
+    public int getPromotionUnit() {
         return buyQuantity + getQuantity;
     }
 
@@ -32,6 +32,7 @@ public class Promotion {
         int promotionUnit = getPromotionUnit();
         return userPurchseQuantity % promotionUnit == 0;
     }
+
 
     //구매할 때 프로모션 재고 부족시, 몇개 상품 정가 구매해야 한다고 알려줘야 할 때 사용
     public int getBuyQuantity(int userPurchseQuantity) {

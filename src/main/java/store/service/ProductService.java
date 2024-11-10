@@ -1,5 +1,6 @@
 package store.service;
 
+import java.util.List;
 import store.model.Product;
 import store.repository.ProductRepository;
 
@@ -27,6 +28,29 @@ public class ProductService {
         if (!promotionApply) {
             productRepository.updateProductQuantity(productName, userPurchaseQuantity);
         }
+    }
+
+    public void checkLowStock(String productName, int quantity, String productPromotionName) {
+        List<Product> products = productRepository.getProducts();
+        for (Product product : products) {
+            if (product.getName().equalsIgnoreCase(productName)) {
+                productRepository.checkStock(product, quantity);
+                break;
+            }
+        }
+
+    }
+
+    public int checkLowStockPromotion(String productName, int quantity, String productPromotionName) {
+        List<Product> products = productRepository.getProducts();
+        for (Product product : products) {
+            if (product.getName().equalsIgnoreCase(productName) &&
+                    productPromotionName.equalsIgnoreCase(product.getPromotion())) {
+                int unitQuantity = promotionService.getUnitQuantity(productPromotionName);
+                return productRepository.checkPromotionStock(product, quantity, unitQuantity);
+            }
+        }
+        return 0;
     }
 
     // 제품 이름을 받아 가격을 반환하는 메서드

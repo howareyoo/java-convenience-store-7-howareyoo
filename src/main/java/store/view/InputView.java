@@ -14,25 +14,24 @@ public class InputView {
     }
 
     public String readPromotionRegularPrice(String item, int itemCount) {
-        StringBuilder message = new StringBuilder();
-        message.append("현재 ")
-                .append(item)
-                .append(itemCount)
-                .append("개는 ")
-                .append("프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까?? (Y/N)");
-        System.out.println("message");
+        String message = "현재 "
+                + item
+                + " "
+                + itemCount
+                + "개는 "
+                + "프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까?? (Y/N)";
+        System.out.println(message);
 
         return Console.readLine();
     }
 
     public String readPromotionApply(String item, int promotionQuantity) {
-        StringBuilder message = new StringBuilder();
-        message.append("현재 ")
-                .append(item)
-                .append("은(는) ")
-                .append(promotionQuantity)
-                .append("개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)");
-        System.out.println("message");
+        String message = "현재 "
+                + item
+                + "은(는) "
+                + promotionQuantity
+                + "개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)";
+        System.out.println(message);
 
         return Console.readLine();
     }

@@ -31,6 +31,12 @@ public class PromotionService {
                 .map(promotion -> promotion.getBuyQuantity(userPurchaseQuantity)).orElse(0);
     }
 
+    public int getUnitQuantity(String promotionName) {
+        List<Promotion> promotions = promotionRepository.getPromotions();
+        return promotionRepository.findPromotion(promotionName, promotions)
+                .map(Promotion::getPromotionUnit).orElse(0);
+    }
+
     public boolean isPromotionActive(String promotionName, LocalDate currentDate) {
         Optional<Promotion> promotionOpt = promotionRepository.findPromotionByName(promotionName);
         return promotionOpt.map(promotion -> promotion.isPromotionActive(currentDate)).orElse(false);
@@ -45,6 +51,18 @@ public class PromotionService {
         }
 
         return 0;
+    }
+
+    public boolean checkPromotionApply(String promotionName, int userPurchaseQuantity) {
+        return isPromotionApply(promotionName, userPurchaseQuantity);
+    }
+
+    public int checkPromotionNotApply(String promotionName, int userPurchaseQuantity) {
+        return getAddQuantityNeed(promotionName, userPurchaseQuantity);
+    }
+
+    public int checkPromotionQuantity(String promotionName) {
+        return getUnitQuantity(promotionName);
     }
 
 

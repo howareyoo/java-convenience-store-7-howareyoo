@@ -44,6 +44,7 @@ public class ProductRepository {
     public void updateProductQuantity(String productName, int quantity) {
         for (Product product : products) {
             if (product.getName().equalsIgnoreCase(productName)) {
+                checkStock(product, quantity);
                 product.setQuantity(product.getQuantity() - quantity);
                 break;
             }
@@ -54,12 +55,29 @@ public class ProductRepository {
         for (Product product : products) {
             if (product.getName().equalsIgnoreCase(productName) &&
                     promotionName.equalsIgnoreCase(product.getPromotion())) {
+                checkStock(product, quantity);
                 product.setQuantity(product.getQuantity() - quantity);
                 break;
             }
         }
     }
-    
+
+
+    public void checkStock(Product product, int quantity) {
+        if (product.getQuantity() < quantity) {
+            throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
+        }
+    }
+
+    public int checkPromotionStock(Product product, int quantity, int unitQuantity) {
+        if (product.getQuantity() < quantity) {
+            int applayValue;
+            applayValue = product.getQuantity() % unitQuantity;
+            return product.getQuantity() - applayValue;
+        }
+        return 0;
+    }
+
     public Optional<Product> findProductByName(String productName) {
         return products.stream()
                 .filter(product -> product.getName().equalsIgnoreCase(productName))
