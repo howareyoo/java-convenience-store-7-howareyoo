@@ -8,8 +8,9 @@ public class InputView {
         return Console.readLine();
     }
 
-    public String membershipApply(){
+    public String readMembershipApply(){
         System.out.println("멤버십 할인을 받으시겠습니까? (Y/N)");
         return Console.readLine();
     }
+
 }
