@@ -25,4 +25,16 @@ public class InputView {
         return Console.readLine();
     }
 
+    public String readPromotionApply(String item, int promotionQuantity) {
+        StringBuilder message = new StringBuilder();
+        message.append("현재 ")
+                .append(item)
+                .append("은(는) ")
+                .append(promotionQuantity)
+                .append("개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)");
+        System.out.println("message");
+
+        return Console.readLine();
+    }
+
 }
