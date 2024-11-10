@@ -47,6 +47,10 @@ public class Product {
         return quantity;
     }
 
+    public String getPromotion() {
+        return promotion;
+    }
+
     public boolean hasName(String productName) {
         return this.name.equalsIgnoreCase(productName);
     }
