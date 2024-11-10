@@ -10,14 +10,13 @@ import store.utils.ItemUtil;
 
 public class PromotionRepository {
 
-    private String fileName;
+    private final List<Promotion> promotions = new ArrayList<>();
 
-    public PromotionRepository(String fileName) {
-        this.fileName = fileName;
+    public PromotionRepository(String fileName) throws URISyntaxException {
+        loadPromotions(fileName);
     }
 
-    public List<Promotion> getPromotions() throws URISyntaxException {
-        List<Promotion> promotions = new ArrayList<>();
+    public void loadPromotions(String fileName) throws URISyntaxException {
         List<String> promotinLines = ItemUtil.curProcuts(fileName);
 
         if (!promotinLines.isEmpty()) {
@@ -27,6 +26,9 @@ public class PromotionRepository {
         for (String line : promotinLines) {
             promotions.add(getPromotion(line));
         }
+    }
+
+    public List<Promotion> getPromotions() {
         return promotions;
     }
 
@@ -42,9 +44,17 @@ public class PromotionRepository {
     }
 
     public Optional<Promotion> findPromotion(String productName, List<Promotion> promotions) {
+
         return promotions.stream()
                 .filter(promotion -> promotion.getName().equalsIgnoreCase(productName))
                 .findFirst();
     }
+
+    public Optional<Promotion> findPromotionByName(String promotionName) {
+        return promotions.stream()
+                .filter(promotion -> promotion.getName().equalsIgnoreCase(promotionName))
+                .findFirst();
+    }
+
 
 }

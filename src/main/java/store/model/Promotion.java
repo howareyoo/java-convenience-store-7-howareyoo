@@ -22,18 +22,23 @@ public class Promotion {
         return name;
     }
 
+    // 프로모션 단위 계산 메서드 (buyQuantity + getQuantity)
+    private int getPromotionUnit() {
+        return buyQuantity + getQuantity;
+    }
+
     //프로모션 하는거에 맞춰서 잘 샀는지 확인 -> 이게 안맞으면 프로모션 상품 안내 1개 더가지고 오라고 안내 할 때 사용
     public boolean applyPromotion(int userPurchseQuantity) {
-        int promotionUnit = buyQuantity + getQuantity;
+        int promotionUnit = getPromotionUnit();
         return userPurchseQuantity % promotionUnit == 0;
     }
 
     //구매할 때 프로모션 재고 부족시, 몇개 상품 정가 구매해야 한다고 알려줘야 할 때 사용
     public int getBuyQuantity(int userPurchseQuantity) {
-        int promotionUnit = buyQuantity + getQuantity;
+        int promotionUnit = getPromotionUnit();
 
         int remainder = userPurchseQuantity % promotionUnit;
-       
+
         if (remainder > 0 && remainder < buyQuantity) {
             return 0;
         }
@@ -45,14 +50,21 @@ public class Promotion {
         return !currentDate.isBefore(startDate) && !currentDate.isAfter(endDate);
     }
 
-    @Override
-    public String toString() {
-        return "Promotion{" +
-                "name='" + name + '\'' +
-                ", buyQuantity=" + buyQuantity +
-                ", getQuantity=" + getQuantity +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                '}';
+    public int calculatePriceWithPromotion(int unitPrice, int quantity) {
+
+        if (quantity < buyQuantity) {
+            return 0;
+        }
+
+        int applicableUnits = getApplicableUnits(quantity);
+        System.out.println(applicableUnits);
+
+        return applicableUnits * unitPrice;
     }
+
+    public int getApplicableUnits(int quantity) {
+        int promotionUnit = getPromotionUnit();
+        return quantity / promotionUnit;
+    }
+
 }
