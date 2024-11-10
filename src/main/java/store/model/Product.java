@@ -3,10 +3,10 @@ package store.model;
 public class Product {
     private String name;
     private int price;
-    private String quantity;
+    private int quantity;
     private String promotion;
 
-    public Product(String name, int price, String quantity, String promotion) {
+    public Product(String name, int price, int quantity, String promotion) {
         this.name = name;
         this.price = price;
         this.quantity = quantity;
@@ -14,7 +14,7 @@ public class Product {
     }
 
     private String getQuantityDisplay() {
-        if (quantity.equals("0")) {
+        if (quantity == 0) {
             return "재고 없음";
         }
         return quantity + "개";
@@ -33,5 +33,13 @@ public class Product {
         String quantityDisplay = getQuantityDisplay();
         String promotionDisplay = getPromotionDisplay();
         return String.join(" ", "-", name, priceFommat, quantityDisplay, promotionDisplay);
+    }
+
+    public boolean hasName(String productName) {
+        return this.name.equalsIgnoreCase(productName);
+    }
+
+    public boolean hasQuantity(int requestedQuantity) {
+        return this.quantity >= requestedQuantity;
     }
 }
