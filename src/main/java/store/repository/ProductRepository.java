@@ -32,9 +32,8 @@ public class ProductRepository {
 
         String name = split[0];
         int price = Integer.parseInt(split[1]);
-        String quantity = split[2];
+        int quantity = Integer.parseInt(split[2]);
         String promotion = split[3];
         return new Product(name, price, quantity, promotion);
     }
-
 }
