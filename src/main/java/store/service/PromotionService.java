@@ -8,7 +8,6 @@ import store.repository.PromotionRepository;
 public class PromotionService {
 
     private final PromotionRepository promotionRepository;
-    private final String fineName = "promotions.md";
 
     public PromotionService(PromotionRepository promotionRepository) {
         this.promotionRepository = promotionRepository;
