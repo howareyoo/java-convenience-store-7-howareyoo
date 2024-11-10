@@ -35,11 +35,34 @@ public class Product {
         return String.join(" ", "-", name, priceFommat, quantityDisplay, promotionDisplay);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
     public boolean hasName(String productName) {
         return this.name.equalsIgnoreCase(productName);
     }
 
     public boolean hasQuantity(int requestedQuantity) {
         return this.quantity >= requestedQuantity;
+    }
+
+    public boolean hasPromotion(String promotion) {
+        return this.promotion.equalsIgnoreCase(promotion);
+    }
+
+    // CSV 형식으로 변환
+    public String toCsvString() {
+        String quantityDisplay = getQuantityDisplay();
+        String promotionDisplay = getPromotionDisplay();
+        return name + "," + price + "," + quantityDisplay + "," + promotionDisplay;
     }
 }
