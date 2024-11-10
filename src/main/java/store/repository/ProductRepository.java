@@ -7,14 +7,14 @@ import store.model.Product;
 import store.utils.ItemUtil;
 
 public class ProductRepository {
-    private String fileName;
 
-    public ProductRepository(String fileName) {
-        this.fileName = fileName;
+    private final List<Product> products = new ArrayList<>();
+
+    public ProductRepository(String fileName) throws URISyntaxException {
+        loadProducts(fileName);
     }
 
-    public List<Product> getProducts() throws URISyntaxException {
-        List<Product> products = new ArrayList<>();
+    private void loadProducts(String fileName) throws URISyntaxException {
         List<String> productLines = ItemUtil.curProcuts(fileName);
 
         if (!productLines.isEmpty()) {
@@ -24,7 +24,10 @@ public class ProductRepository {
         for (String line : productLines) {
             products.add(getProduct(line));
         }
-        return products;
+    }
+
+    public List<Product> getProducts() {
+        return new ArrayList<>(products);  // 리스트 복사본 반환 (수정 방지)
     }
 
     private Product getProduct(String line) {
@@ -36,4 +39,15 @@ public class ProductRepository {
         String promotion = split[3];
         return new Product(name, price, quantity, promotion);
     }
+
+    public void updateProductQuantity(String productName, int quantity) throws URISyntaxException {
+        for (Product product : products) {
+            if (product.getName().equalsIgnoreCase(productName)) {
+                product.setQuantity(product.getQuantity() - quantity);
+                break;
+            }
+        }
+    }
+
+
 }
