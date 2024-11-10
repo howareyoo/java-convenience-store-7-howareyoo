@@ -51,6 +51,10 @@ public class Product {
         return promotion;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
     public boolean hasName(String productName) {
         return this.name.equalsIgnoreCase(productName);
     }
@@ -62,11 +66,5 @@ public class Product {
     public boolean hasPromotion(String promotion) {
         return this.promotion.equalsIgnoreCase(promotion);
     }
-
-    // CSV 형식으로 변환
-    public String toCsvString() {
-        String quantityDisplay = getQuantityDisplay();
-        String promotionDisplay = getPromotionDisplay();
-        return name + "," + price + "," + quantityDisplay + "," + promotionDisplay;
-    }
+    
 }
