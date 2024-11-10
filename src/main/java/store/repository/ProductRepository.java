@@ -3,6 +3,7 @@ package store.repository;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import store.model.Product;
 import store.utils.ItemUtil;
 
@@ -57,5 +58,11 @@ public class ProductRepository {
                 break;
             }
         }
+    }
+    
+    public Optional<Product> findProductByName(String productName) {
+        return products.stream()
+                .filter(product -> product.getName().equalsIgnoreCase(productName))
+                .findFirst();
     }
 }
