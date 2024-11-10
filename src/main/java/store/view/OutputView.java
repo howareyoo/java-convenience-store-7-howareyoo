@@ -11,9 +11,9 @@ public class OutputView {
         System.out.println("안녕하세요. W편의점입니다.\n"
                 + "현재 보유하고 있는 상품입니다.");
         String fileName = "products.md";
-        ProductRepository productDAO = new ProductRepository(fileName);
+        ProductRepository productRepository = new ProductRepository(fileName);
 
-        List<Product> products = productDAO.getProducts();
+        List<Product> products = productRepository.getProducts();
         for (Product product : products) {
             System.out.println(product);
         }
