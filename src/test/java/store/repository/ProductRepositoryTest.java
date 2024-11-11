@@ -13,7 +13,7 @@ class ProductRepositoryTest {
         String fileName = "products.md";
         ProductRepository productRepository = new ProductRepository(fileName);
         List<Product> products = productRepository.getProducts();
-        Assertions.assertThat(products).hasSize(16);
+        Assertions.assertThat(products).hasSize(18);
     }
 
     @Test

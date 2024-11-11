@@ -16,11 +16,11 @@ class PurchaseServiceTest {
         String fileName2 = "promotions.md";
         PurchaseService purchaseService = getPurchaseService(fileName1, fileName2);
 
-        String userInput = "[콜라-0],[사이다-3]";
+        String userInput = "[콜라-1],[사이다-3]";
 
         Map<String, Integer> stringIntegerMap = purchaseService.parseProductInput(userInput);
         Assertions.assertThat(stringIntegerMap).hasSize(2);
-        Assertions.assertThat(stringIntegerMap.get("콜라")).isEqualTo(0);
+        Assertions.assertThat(stringIntegerMap.get("콜라")).isEqualTo(1);
         Assertions.assertThat(stringIntegerMap.get("사이다")).isEqualTo(3);
     }
 
@@ -34,9 +34,8 @@ class PurchaseServiceTest {
         int price = 1000;
         int quantity = 3;
 
-        int totalPurchase = purchaseService.calculateTotalPromotion(productName, price, quantity);
-        Assertions.assertThat(totalPurchase).isEqualTo(2000);
-
+        int totalPromotionPrice = purchaseService.calculateTotalPromotion(productName, price, quantity);
+        Assertions.assertThat(totalPromotionPrice).isEqualTo(1000);
 
     }
 
