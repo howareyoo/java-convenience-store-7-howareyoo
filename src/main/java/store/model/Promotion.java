@@ -58,7 +58,6 @@ public class Promotion {
         }
 
         int applicableUnits = getApplicableUnits(quantity);
-        System.out.println(applicableUnits);
 
         return applicableUnits * unitPrice;
     }
