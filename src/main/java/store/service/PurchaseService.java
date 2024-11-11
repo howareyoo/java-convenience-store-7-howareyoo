@@ -141,7 +141,6 @@ public class PurchaseService {
 
     public int calculateTotalPromotion(String productName, int price, int quantity) {
         String productPromotionName = productService.getProductPromotion(productName);
-        System.out.println(productPromotionName);
         return promotionService.calculatePromotionPrice(productPromotionName, price, quantity);
     }
 
