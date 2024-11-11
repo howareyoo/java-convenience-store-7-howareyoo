@@ -14,11 +14,6 @@ public class PromotionService {
         this.promotionRepository = promotionRepository;
     }
 
-    public Optional<Promotion> getPromotionForProduct(String productName) {
-        List<Promotion> promotions = promotionRepository.getPromotions();
-        return promotionRepository.findPromotion(productName, promotions);
-    }
-
     public boolean isPromotionApply(String promotionName, int userPurchaseQuantity) {
         List<Promotion> promotions = promotionRepository.getPromotions();
         return promotionRepository.findPromotion(promotionName, promotions)
@@ -61,15 +56,18 @@ public class PromotionService {
         return getAddQuantityNeed(promotionName, userPurchaseQuantity);
     }
 
-    public int checkPromotionQuantity(String promotionName) {
-        return getUnitQuantity(promotionName);
+    public boolean isPromotionActiveOnDate(String productPromotionName, LocalDate currentDate) {
+        return promotionRepository.findPromotionByName(productPromotionName)
+                .map(promotion -> promotion.isPromotionActive(currentDate))
+                .orElse(false); // 프로모션이 없거나 비활성 상태인 경우 false 반환
     }
 
-
     public int getApplicableUnitsIfActive(String productPromotionName, int quantity, LocalDate currentDate) {
-        return promotionRepository.findPromotionByName(productPromotionName)
-                .filter(promotion -> promotion.isPromotionActive(currentDate)) // 프로모션 활성 상태 필터링
-                .map(promotion -> promotion.getApplicableUnits(quantity))
-                .orElse(0); // 프로모션이 없거나 비활성 상태인 경우 0 반환
+        if (isPromotionActiveOnDate(productPromotionName, currentDate)) {
+            return promotionRepository.findPromotionByName(productPromotionName)
+                    .map(promotion -> promotion.getApplicableUnits(quantity))
+                    .orElse(0);
+        }
+        return 0;
     }
 }
