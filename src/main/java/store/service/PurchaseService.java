@@ -44,33 +44,10 @@ public class PurchaseService {
             String productName = entry.getKey();
             int quantity = entry.getValue();
             String productPromotionName = productService.getProductPromotion(productName);
-            productService.checkLowStock(productName, quantity, productPromotionName);
 
-            // 프로모션 적용 여부 확인
-            boolean promotionApply = promotionService.checkPromotionApply(productPromotionName, quantity);
-
-            if (!promotionApply) {
-                // 프로모션 적용을 위해 필요한 추가 수량 계산
-                int promotionNotApply = promotionService.checkPromotionNotApply(productPromotionName, quantity);
-
-                // 사용자에게 추가 구매 의사 묻기
-                String response = inputView.readPromotionApply(productName, promotionNotApply);
-
-                if (response.equalsIgnoreCase("Y")) {
-                    // 수량 증가
-                    quantity += promotionNotApply;
-                }
-                // else: 사용자가 추가 구매를 원하지 않으면 수량 변경 없음
-            }
-            int lowStockPromotion = productService.checkLowStockPromotion(productName, quantity, productPromotionName);
-
-            if (lowStockPromotion > 0) {
-                String response = inputView.readPromotionRegularPrice(productName, lowStockPromotion);
-
-                if (response.equalsIgnoreCase("N")) {
-                    throw new IllegalArgumentException("[ERROR]사용자가 정가 구매를 원하지 않습니다. 다시 입력해 주세요.");
-                }
-            }
+            checkLowStock(productName, quantity, productPromotionName);
+            quantity = applyPromotionIfNeeded(productName, productPromotionName, quantity);
+            checkAndAdjustForRegularPrice(productName, productPromotionName, quantity);
 
             adjustedPurchaseItem.put(productName, quantity);
         }
@@ -78,16 +55,54 @@ public class PurchaseService {
         return adjustedPurchaseItem;
     }
 
+    private void checkLowStock(String productName, int quantity, String productPromotionName) {
+        productService.checkLowStock(productName, quantity, productPromotionName);
+    }
+
+    private int applyPromotionIfNeeded(String productName, String productPromotionName, int quantity) {
+        if (shouldApplyPromotion(productPromotionName, quantity)) {
+            int additionalQuantity = calculateAdditionalQuantity(productName, productPromotionName, quantity);
+            quantity += additionalQuantity;
+        }
+        return quantity;
+    }
+
+    private boolean shouldApplyPromotion(String productPromotionName, int quantity) {
+        boolean promotionApply = promotionService.checkPromotionApply(productPromotionName, quantity);
+        boolean isPromotionActive = promotionService.isPromotionActive(productPromotionName, LocalDate.now());
+        return !promotionApply && isPromotionActive;
+    }
+
+    private int calculateAdditionalQuantity(String productName, String productPromotionName, int quantity) {
+        int promotionNotApply = promotionService.checkPromotionNotApply(productPromotionName, quantity);
+        if (promotionNotApply > 0) {
+            String response = inputView.readPromotionApply(productName, promotionNotApply);
+            if (response.equalsIgnoreCase("Y")) {
+                return promotionNotApply;
+            }
+        }
+        return 0;
+    }
+
+    private void checkAndAdjustForRegularPrice(String productName, String productPromotionName, int quantity) {
+        int lowStockPromotion = productService.checkLowStockPromotion(productName, quantity, productPromotionName);
+
+        if (lowStockPromotion > 0) {
+            String response = inputView.readPromotionRegularPrice(productName, lowStockPromotion);
+
+            if (response.equalsIgnoreCase("N")) {
+                throw new IllegalArgumentException("[ERROR] 사용자가 정가 구매를 원하지 않습니다. 다시 입력해 주세요.");
+            }
+        }
+    }
+
+
     private List<String> parseItemDetail(String item) {
         item = item.trim();
-
-        // 입력 형식 검증 및 대괄호 제거
         item = removeBracketsAndValidate(item);
 
-        // 상품명과 수량으로 분리
         String[] itemDetail = splitItemDetail(item);
 
-        // 수량 파싱 및 검증
         String productName = itemDetail[0].trim();
         int quantity = parseAndValidateQuantity(itemDetail[1].trim());
 
@@ -132,26 +147,41 @@ public class PurchaseService {
 
     public Map<String, Purchase> calculateTotalOrigin(Map<String, Integer> userPurchaseItem, boolean isDiscount) {
         Map<String, Purchase> purchaseDetails = new HashMap<>();
+        LocalDate currentDate = LocalDate.from(DateTimes.now());
 
         for (Map.Entry<String, Integer> entry : userPurchaseItem.entrySet()) {
             String productName = entry.getKey();
-            String productPromotionName = productService.getProductPromotion(productName);
             int quantity = entry.getValue();
-            int unitPrice = productService.getProductPrice(productName);
-            int discountPrice = membershipService.applayMembershipDiscount(isDiscount, unitPrice);
-            int calculateTotalPromotion = calculateTotalPromotion(productName, unitPrice, quantity);
-            LocalDate currentDate = LocalDate.from(DateTimes.now());
-            int promotionQuantity = promotionService.getApplicableUnitsIfActive(productPromotionName, quantity,
-                    currentDate);
-            System.out.println("productName = " + productName + ", promotionQuantity = " + promotionQuantity
-                    + " calculateTotalPromotion = " + calculateTotalPromotion);
-            Purchase detail = new Purchase(productName, quantity, unitPrice, discountPrice, promotionQuantity,
-                    calculateTotalPromotion);
-            purchaseDetails.put(productName, detail);
-            productService.checkPromotionQuantity(productName, productPromotionName, quantity);
+
+            Purchase purchase = createPurchaseDetail(productName, quantity, isDiscount, currentDate);
+            purchaseDetails.put(productName, purchase);
+
+            updatePromotionQuantity(productName, quantity);
         }
 
         return purchaseDetails;
+    }
+
+    private Purchase createPurchaseDetail(String productName, int quantity, boolean isDiscount, LocalDate currentDate) {
+        String productPromotionName = productService.getProductPromotion(productName);
+        int unitPrice = productService.getProductPrice(productName);
+        int discountPrice = membershipService.applayMembershipDiscount(isDiscount, unitPrice);
+        int calculateTotalPromotion = calculateTotalPromotion(productName, unitPrice, quantity);
+        int promotionQuantity = getPromotionQuantity(productPromotionName, quantity, currentDate);
+
+        System.out.println("productName = " + productName + ", promotionQuantity = " + promotionQuantity
+                + ", calculateTotalPromotion = " + calculateTotalPromotion);
+
+        return new Purchase(productName, quantity, unitPrice, discountPrice, promotionQuantity, calculateTotalPromotion);
+    }
+
+    private int getPromotionQuantity(String productPromotionName, int quantity, LocalDate currentDate) {
+        return promotionService.getApplicableUnitsIfActive(productPromotionName, quantity, currentDate);
+    }
+
+    private void updatePromotionQuantity(String productName, int quantity) {
+        String productPromotionName = productService.getProductPromotion(productName);
+        productService.checkPromotionQuantity(productName, productPromotionName, quantity);
     }
 
 }
