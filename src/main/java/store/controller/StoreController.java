@@ -1,5 +1,6 @@
 package store.controller;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 import store.model.Purchase;
 import store.service.ProductService;
@@ -20,11 +21,10 @@ public class StoreController {
     }
 
     public void processPurchase(Map<String, Integer> userPurchaseItem, boolean applyMembershipDiscount) {
-        // 구매 세부 정보 가져오기
+
         Map<String, Purchase> purchaseDetails = purchaseService.calculateTotalOrigin(userPurchaseItem,
                 applyMembershipDiscount);
 
-        // 최종 영수증 출력
         printReceipt(purchaseDetails);
     }
 
@@ -32,26 +32,25 @@ public class StoreController {
         boolean continuePurchasing = true;
         while (continuePurchasing) {
             try {
-                // 1. 상품과 수량 입력 받기
+                outputView.printProducts();
+
                 String userInput = inputView.readItem();
                 Map<String, Integer> userPurchaseItem = purchaseService.parseProductInput(userInput);
 
-                // 2. 프로모션 적용을 위한 수량 조정
                 userPurchaseItem = purchaseService.adjustQuantitiesForPromotions(userPurchaseItem);
 
-                // 3. 멤버십 할인 여부 입력 받기
                 String membershipResponse = inputView.readMembershipApply();
                 boolean applyMembershipDiscount = membershipResponse.equalsIgnoreCase("Y");
 
-                // 4. 구매 확인 및 영수증 출력
                 processPurchase(userPurchaseItem, applyMembershipDiscount);
 
-                // 5. 추가 구매 여부 확인
                 String additionalResponse = inputView.readAdditionalPurchases();
                 continuePurchasing = additionalResponse.equalsIgnoreCase("Y");
 
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
         }
     }
