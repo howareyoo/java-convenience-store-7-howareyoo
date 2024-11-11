@@ -34,8 +34,11 @@ public class PromotionService {
 
     public boolean isPromotionActive(String promotionName, LocalDate currentDate) {
         Optional<Promotion> promotionOpt = promotionRepository.findPromotionByName(promotionName);
-        return promotionOpt.map(promotion -> promotion.isPromotionActive(currentDate)).orElse(false);
+        boolean active = promotionOpt.map(promotion -> promotion.isPromotionActive(currentDate)).orElse(false);
+        System.out.println("Promotion active status for " + promotionName + " on " + currentDate + ": " + active);
+        return active;
     }
+
 
     public int calculatePromotionPrice(String promotionName, int unitPrice, int quantity) {
         Optional<Promotion> promotionOpt = promotionRepository.findPromotionByName(promotionName);
